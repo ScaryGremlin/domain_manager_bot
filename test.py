@@ -1,13 +1,11 @@
-import miscellaneous as misc
+from domain_manager import DomainManager
 
-fio = "Джемакулов Артур Александрович"
-org_unit = "back_office"
-DOMAIN = "CO.MFCMGO.RU"
+dm = DomainManager("192.168.213.235", "CO\Administrator", "RP21-kmn10root")
 
 
-surname, name, _, login = misc.requisites_to_data(fio)
-cn = f"CN={name} {surname},"
-ou = f"OU={org_unit},"
-dc = ",".join([f"DC={element}" for element in DOMAIN.split(".")])
-dn = cn + ou + dc
-print(dn)
+if dm.is_connected:
+    result = dm.add_user_account("Петушаркин Иван Сергеевич", "frontoffice", "+79994970133")
+    print(result)
+else:
+    print("Что-то не то с подключением")
+

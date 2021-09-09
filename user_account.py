@@ -3,7 +3,7 @@ from ldap3 import MODIFY_REPLACE
 
 class UserAccount:
     """
-    Класс пучётных записей пользователей
+    Класс учётных записей пользователей
     """
     def __init__(self, fio: str, mobile: str):
         """
