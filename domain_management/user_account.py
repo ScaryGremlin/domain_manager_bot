@@ -66,5 +66,9 @@ class UserAccount:
         return self.__login
 
     @property
+    def personal_dir(self):
+        return self.__login
+
+    @property
     def mobile(self):
         return self.__mobile

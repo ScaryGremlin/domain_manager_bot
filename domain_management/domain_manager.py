@@ -1,26 +1,16 @@
-import emoji
 from ldap3 import Connection, Server, ALL
 from ldap3.core.exceptions import LDAPException
 
-import miscellaneous as misc
-from credentials import DOMAIN
-from user_account import UserAccount
+from data.creds import DOMAIN
+from domain_management import misc
+from domain_management.results_messages import ResultsMessages
+from domain_management.user_account import UserAccount
 
 
 class DomainManager:
     """
     Класс управления Active Directory
     """
-
-    ACCOUNT_ADDED = emoji.emojize(":check_mark: Учётная запись пользователя добавлена.\n")
-    ERROR_ACCOUNT_ADDING = emoji.emojize(":cross_mark: Ошибка добавления учётной записи пользователя.\n")
-
-    PASSWORD_SET = emoji.emojize(":check_mark: Пароль учётной записи по умолчанию установлен.\n")
-    ERROR_PASSWORD_SETTING = emoji.emojize(":cross_mark: Ошибка установки пароля учётной записи.\n")
-
-    ACCOUNT_ATTRS_CHANGED = emoji.emojize(":check_mark: Атрибуты учётной записи изменены.\n")
-    ERROR_ATTRS_CHANGING = emoji.emojize(":cross_mark: Ошибка изменения арибутов учётной записи.\n")
-
     def __init__(self, server_ip: str, login: str, password: str):
         """
         Конструктор
@@ -62,11 +52,6 @@ class DomainManager:
         :param mobile: Мобильный телефон пользователя
         :return: Список ошибок или успешных выполнений команд
         """
-        result_adding_user = {
-            "has_account_been_added": False,
-            "has_password_been_set": False,
-            "has_attrs_changed": False
-        }
         user_account = UserAccount(fio, mobile)
         # Сгенерировать строку dn
         dn = self.__get_dn(user_account.surname, user_account.name, org_unit, DOMAIN)
@@ -77,15 +62,20 @@ class DomainManager:
         # Сгенерировать пароль по умолчанию - месяц и год, например, август2021
         password = misc.get_password()
         if not self.__connection.add(dn, object_class, account_attrs):
-            return result_adding_user
+            return (ResultsMessages.ERROR_USER_ACCOUNT_ADDING,
+                    ResultsMessages.ERROR_USER_PASSWORD_SETTING,
+                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
         elif not self.__connection.extend.microsoft.modify_password(dn, password):
-            result_adding_user.update({"has_account_been_added": True})
-            return result_adding_user
+            return (ResultsMessages.USER_ACCOUNT_ADDED,
+                    ResultsMessages.ERROR_USER_PASSWORD_SETTING,
+                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
         elif not self.__connection.modify(dn, uac_account_attrs):
-            result_adding_user.update({"has_password_been_set": True})
-            return result_adding_user
-        result_adding_user.update({"has_attrs_changed": True})
-        return result_adding_user
+            return (ResultsMessages.USER_ACCOUNT_ADDED,
+                    ResultsMessages.USER_PASSWORD_SET,
+                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
+        return (ResultsMessages.USER_ACCOUNT_ADDED,
+                ResultsMessages.USER_ACCOUNT_ATTRS_CHANGED,
+                ResultsMessages.USER_PASSWORD_SET)
 
     @property
     def is_connected(self):

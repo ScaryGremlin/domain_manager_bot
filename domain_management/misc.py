@@ -24,6 +24,3 @@ def get_password(password_length=6, by_chance=None) -> str:
         month = date.month
         year = date.year
         return list_of_months[month - 1] + str(year)
-
-
-
