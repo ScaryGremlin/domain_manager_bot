@@ -34,7 +34,7 @@ class UserAccount:
         # Установить основные атрибуты учётной записи.
         # Фамилия, имя, логин для входа - Фамилия_ИО, отображаемое имя и мобильный телефон.
         account_attrs = {
-            'sn': self.__surname,
+            "sn": self.__surname,
             "givenName": self.__name,
             "sAMAccountName": self.__login,
             "displayName": f"{self.__name} {self.__surname}",

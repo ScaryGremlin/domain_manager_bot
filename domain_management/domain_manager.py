@@ -44,7 +44,7 @@ class DomainManager:
         dc = ",".join([f"DC={element}" for element in domain.split(".")])
         return cn + ou + dc
 
-    def add_user_account(self, fio: str, org_unit: str, mobile: str):
+    def add_user_account(self, fio: str, org_unit: str, mobile: str) -> tuple:
         """
         Добавить пользователя
         :param fio: Фамилия, имя, отчество пользователя
@@ -62,21 +62,28 @@ class DomainManager:
         # Сгенерировать пароль по умолчанию - месяц и год, например, август2021
         password = misc.get_password()
         if not self.__connection.add(dn, object_class, account_attrs):
-            return (ResultsMessages.ERROR_USER_ACCOUNT_ADDING,
-                    ResultsMessages.ERROR_USER_PASSWORD_SETTING,
-                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
+            return (False, (ResultsMessages.ERROR_USER_ACCOUNT_ADDING,
+                            ResultsMessages.ERROR_USER_PASSWORD_SETTING,
+                            ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING))
         elif not self.__connection.extend.microsoft.modify_password(dn, password):
-            return (ResultsMessages.USER_ACCOUNT_ADDED,
-                    ResultsMessages.ERROR_USER_PASSWORD_SETTING,
-                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
+            return (False, (ResultsMessages.USER_ACCOUNT_ADDED,
+                            ResultsMessages.ERROR_USER_PASSWORD_SETTING,
+                            ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING))
         elif not self.__connection.modify(dn, uac_account_attrs):
-            return (ResultsMessages.USER_ACCOUNT_ADDED,
-                    ResultsMessages.USER_PASSWORD_SET,
-                    ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING)
-        return (ResultsMessages.USER_ACCOUNT_ADDED,
-                ResultsMessages.USER_ACCOUNT_ATTRS_CHANGED,
-                ResultsMessages.USER_PASSWORD_SET)
+            return (False, (ResultsMessages.USER_ACCOUNT_ADDED,
+                            ResultsMessages.USER_PASSWORD_SET,
+                            ResultsMessages.ERROR_USER_ACCOUNTS_ATTRS_CHANGING))
+        return (True, (ResultsMessages.USER_ACCOUNT_ADDED,
+                       ResultsMessages.USER_ACCOUNT_ATTRS_CHANGED,
+                       ResultsMessages.USER_PASSWORD_SET))
+
+    def disconnect(self):
+        return self.__connection.unbind()
 
     @property
     def is_connected(self):
         return self.__connection
+
+    @property
+    def result(self):
+        return self.__connection.result

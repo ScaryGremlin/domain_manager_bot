@@ -11,5 +11,9 @@ from loader import dispatcher
 async def check_connection_command(message: types.Message):
     dm = DomainManager(creds.AD_SERVER_IP, creds.AD_LOGIN, creds.AD_PASSWORD)
     if dm.is_connected:
-        await message.answer(ResultsMessages.CONNECTION_TO_AD_SUCCESSFUL)
-    await message.answer(ResultsMessages.ERROR_CONNECTING_AD)
+        code_connect = f"<code>{dm.result}</code>"
+        msg_result = f"{ResultsMessages.CONNECTION_TO_AD_SUCCESSFUL}\n{code_connect}"
+        await message.answer(msg_result)
+        dm.disconnect()
+    else:
+        await message.answer(ResultsMessages.ERROR_CONNECTING_AD)

@@ -24,3 +24,13 @@ def get_password(password_length=6, by_chance=None) -> str:
         month = date.month
         year = date.year
         return list_of_months[month - 1] + str(year)
+
+
+def get_userdata_from_rawstring(raw_string: str) -> list:
+    """
+    Получить данные пользователя - ФИО, подразделение, мобильный телефон в виде списка
+    Строка, разделяется по запятой в список, с удалением символов пробела в начале и в конце каждого элемента списка
+    :param raw_string: Сырая строка данных
+    :return: Список данных
+    """
+    return [element.strip() for element in raw_string.split(",")]
