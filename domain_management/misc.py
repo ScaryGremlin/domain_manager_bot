@@ -50,8 +50,16 @@ def execute_ssh_command_as_sudo(server_ip: str, username: str, sudo_password: st
     with paramiko.SSHClient() as ssh_client:
         id_rsa = paramiko.RSAKey.from_private_key_file("/home/member/.ssh/id_rsa")
         ssh_client.load_system_host_keys()
-        ssh_client.connect(server_ip, username=username, pkey=id_rsa)
+        print(server_ip)
+        print(username)
+
+        ssh_client.connect("192.168.213.235", username="member", pkey=id_rsa)
+        # ssh_client.connect(server_ip, username=username, pkey=id_rsa)
         stdin, stdout, stderr = ssh_client.exec_command(command, get_pty=True)
+        command_c = "sudo smbcacls //192.168.213.238/exchange 123 -a 'ACL:Джемакулов_АА:ALLOWED/OI|CI/0x001201ff' --authentication-file=/home/member/.creds/smbcacls_creds"
+        command_b = "sudo ls -la"
+        # stdin, stdout, stderr = ssh_client.exec_command(command_c, get_pty=True)
         stdin.write(f"{sudo_password}\n")
         stdin.flush()
+        print(stdout.readlines())
     return stdout, stderr
