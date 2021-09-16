@@ -1,6 +1,8 @@
 import random
 from datetime import datetime
 
+import paramiko
+
 
 def get_password(password_length=6, by_chance=None) -> str:
     """
@@ -34,3 +36,22 @@ def get_userdata_from_rawstring(raw_string: str) -> list:
     :return: Список данных
     """
     return [element.strip() for element in raw_string.split(",")]
+
+
+def execute_ssh_command_as_sudo(server_ip: str, username: str, sudo_password: str, command: str) -> tuple:
+    """
+    Выполнить команду по ssh
+    :param server_ip: ip-адрес ssh-сервера
+    :param username: Имя пользователя для подключения к ssh-серверу
+    :param sudo_password: Пароль пользователя с правами sudo
+    :param command: Команда, которую необходимо выполнить по ssh
+    :return: Поток вывода и поток ошибок выполнения команды ssh
+    """
+    with paramiko.SSHClient() as ssh_client:
+        id_rsa = paramiko.RSAKey.from_private_key_file("/home/member/.ssh/id_rsa")
+        ssh_client.load_system_host_keys()
+        ssh_client.connect(server_ip, username=username, pkey=id_rsa)
+        stdin, stdout, stderr = ssh_client.exec_command(command, get_pty=True)
+        stdin.write(f"{sudo_password}\n")
+        stdin.flush()
+    return stdout, stderr
