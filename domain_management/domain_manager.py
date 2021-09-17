@@ -81,13 +81,16 @@ class DomainManager:
 
     def get_all_users(self, attrs: list):
         """
-
-        :param attrs:
-        :return:
+        Получить список всех пользователей домена
+        :param attrs: Атрибуты пользователя, которые необходимо получить
+        :return: Список всех пользователей домена
         """
         search_tree = self.__get_search_tree(self.__domain)
         self.__connection.search(search_tree, "(objectCategory=person)", SUBTREE, attributes=attrs)
         return self.__connection.entries
+
+    def get_all_org_units(self):
+        pass
 
     def disconnect(self):
         return self.__connection.unbind()

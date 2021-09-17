@@ -1,16 +1,17 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Command
-from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher.storage import FSMContext
-from states import CreateUserDirQuestions
+from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
+
 from data import creds
 from domain_management.domain_manager import DomainManager
 from domain_management.results_messages import ResultsMessages
 from loader import dispatcher
+from states import CreateUserDirQuestions
 
 
 @dispatcher.message_handler(Command("create_user_dir"))
-async def check_connection_command(message: types.Message):
+async def select_user_button_command(message: types.Message):
     buttons = [
         [InlineKeyboardButton(text="Выбрать пользователя", switch_inline_query_current_chat="users")]
     ]
@@ -18,8 +19,8 @@ async def check_connection_command(message: types.Message):
     await CreateUserDirQuestions.first()
 
 
-@dispatcher.inline_handler(text="users")
-async def empty_query(query: types.InlineQuery):
+@dispatcher.inline_handler(text="users", state=CreateUserDirQuestions.Q1)
+async def select_user_command(query: types.InlineQuery, state: FSMContext):
     dm = DomainManager(creds.AD_SERVER_IP, creds.DOMAIN, creds.AD_LOGIN, creds.AD_PASSWORD)
     if dm.is_connected:
         attrs = ["sAMAccountName", "displayName", "mobile"]
