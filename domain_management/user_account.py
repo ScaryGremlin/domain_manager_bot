@@ -5,12 +5,13 @@ class UserAccount:
     """
     Класс учётных записей пользователей
     """
-    def __init__(self, fio: str, mobile: str):
+    def __init__(self, fio: str, org_unit: str, mobile: str):
         """
         Конструктор
         :param fio: Фамилия, имя и отчетсво пользователя
         """
         self.__surname, self.__name, self.__middle_name, self.__login = self.__requisites_to_data(fio)
+        self.__org_unit = org_unit
         self.__mobile = mobile
 
     @staticmethod
@@ -68,6 +69,10 @@ class UserAccount:
     @property
     def personal_dir(self):
         return self.__login
+
+    @property
+    def org_unit(self):
+        return self.__org_unit
 
     @property
     def mobile(self):

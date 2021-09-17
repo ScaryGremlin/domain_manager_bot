@@ -8,6 +8,7 @@ from aiogram.dispatcher.filters import CommandHelp
 async def help_command(message: types.Message):
     await message.answer("/check_connection — проверить соединение с сервером Active Directory; \n"
                          "/add_user_account — добавить учётную запись пользователя домена; \n"
+                         "/create_user_dir — создать личную директорию пользователя и файл с паролем; \n"
                          "\n"
                          "/description_creds — описание файла <code>credentials</code> для подключения "
                          "к Active Directory; \n"                         

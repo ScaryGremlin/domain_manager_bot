@@ -1,7 +1,7 @@
 import smb.smb_structs
 from smb.SMBConnection import SMBConnection
 
-import misc
+from domain_management import misc
 
 
 class SMBConnector:
