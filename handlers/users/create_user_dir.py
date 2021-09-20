@@ -9,16 +9,25 @@ from domain_management.domain_manager import DomainManager
 from domain_management.results_messages import ResultsMessages
 from loader import dispatcher
 from states import CreateUserDirQuestions
-import base64
+import json
 
 
 @dispatcher.message_handler(Command("create_user_dir"))
 async def select_user_button_command(message: types.Message):
-    buttons = [
-        [InlineKeyboardButton(text="Выбрать пользователя", switch_inline_query_current_chat="users")]
-    ]
-    await message.answer("Создать директорию пользователя", reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
-    # await CreateUserDirQuestions.first()
+    dm = DomainManager(creds.AD_SERVER_IP, creds.DOMAIN, creds.AD_LOGIN, creds.AD_PASSWORD)
+    if dm.is_connected:
+        attrs = ["sAMAccountName", "displayName", "mobile"]
+        dm.get_all_users(attrs)
+        with open("all_users.json", "w") as all_users_file:
+            json.dump(dm.get_all_users_as_dict(), all_users_file, sort_keys=True, indent=2, ensure_ascii=False)
+        dm.disconnect()
+        buttons = [
+            [InlineKeyboardButton(text="Выбрать пользователя", switch_inline_query_current_chat="users")]
+        ]
+        await message.answer("Создать директорию пользователя",
+                             reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
+    else:
+        await message.answer(ResultsMessages.ERROR_CONNECTING_AD)
 
 
 @dispatcher.inline_handler(text="users")

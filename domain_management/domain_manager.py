@@ -82,15 +82,9 @@ class DomainManager:
                        ResultsMessages.USER_ACCOUNT_ATTRS_CHANGED,
                        ResultsMessages.USER_PASSWORD_SET))
 
-    def get_all_users(self, attrs: list, paged_size: int, paged_cookie: bytes = None):
-        self.__connection.search(self.__search_tree,
-                                 "(objectCategory=person)",
-                                 SUBTREE,
-                                 attributes=attrs,
-                                 paged_size=paged_size,
-                                 paged_cookie=paged_cookie)
-        cookie = self.__connection.result["controls"]["1.2.840.113556.1.4.319"]["value"]["cookie"]
-        return cookie, self.__connection.entries
+    def get_all_users(self, attrs):
+        self.__connection.search(self.__search_tree, "(objectCategory=person)", SUBTREE, attributes=attrs)
+        return self.__connection.entries
 
     def get_all_org_units(self, attrs: list):
         self.__connection.search(self.__search_tree, "(objectClass=organizationalUnit)", SUBTREE, attributes=attrs)
