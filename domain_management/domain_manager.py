@@ -22,6 +22,7 @@ class DomainManager:
         """
         self.__ldap_server = Server(server_ip, get_info=ALL)
         self.__domain = domain
+        self.__search_tree = self.__get_search_tree(domain)
         self.__login = login
         self.__password = password
         self.__connection = self.__connect()
@@ -81,15 +82,19 @@ class DomainManager:
                        ResultsMessages.USER_ACCOUNT_ATTRS_CHANGED,
                        ResultsMessages.USER_PASSWORD_SET))
 
-    def get_all_users(self, attrs: list):
-        """
-        Получить список всех пользователей домена
-        :param attrs: Атрибуты пользователя, которые необходимо получить
-        :return: Список всех пользователей домена
-        """
-        search_tree = self.__get_search_tree(self.__domain)
-        self.__connection.search(search_tree, "(objectCategory=person)", SUBTREE, attributes=attrs)
-        return self.__connection.entries
+    def get_all_users(self, attrs: list, paged_size: int, paged_cookie: bytes = None):
+        self.__connection.search(self.__search_tree,
+                                 "(objectCategory=person)",
+                                 SUBTREE,
+                                 attributes=attrs,
+                                 paged_size=paged_size,
+                                 paged_cookie=paged_cookie)
+        cookie = self.__connection.result["controls"]["1.2.840.113556.1.4.319"]["value"]["cookie"]
+        return cookie, self.__connection.entries
+
+    def get_all_org_units(self, attrs: list):
+        self.__connection.search(self.__search_tree, "(objectClass=organizationalUnit)", SUBTREE, attributes=attrs)
+        return self.__connection.response
 
     def get_all_users_as_dict(self) -> dict:
         """
@@ -104,11 +109,6 @@ class DomainManager:
                 }
             })
         return users_attrs_as_dict
-
-    def get_all_org_units(self, attrs: list):
-        search_tree = self.__get_search_tree(self.__domain)
-        self.__connection.search(search_tree, "(objectClass=organizationalUnit)", SUBTREE, attributes=attrs, )
-        return self.__connection.entries
 
     def disconnect(self):
         return self.__connection.unbind()
