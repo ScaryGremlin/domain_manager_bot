@@ -10,6 +10,7 @@ from domain_management.results_messages import ResultsMessages
 from loader import dispatcher
 from states import CreateUserDirQuestions
 import json
+import itertools
 
 
 @dispatcher.message_handler(Command("create_user_dir"))
@@ -32,6 +33,8 @@ async def select_user_button_command(message: types.Message):
 
 @dispatcher.inline_handler(text="users")
 async def select_user_command(query: types.InlineQuery):
+
+
     # dm = DomainManager(creds.AD_SERVER_IP, creds.DOMAIN, creds.AD_LOGIN, creds.AD_PASSWORD)
     # if dm.is_connected:
     #     query.offset = 20
