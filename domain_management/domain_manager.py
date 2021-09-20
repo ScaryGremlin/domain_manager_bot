@@ -1,4 +1,5 @@
 from ldap3 import Connection, Server, ALL, SUBTREE
+from ldap3.abstract.entry import Entry
 from ldap3.core.exceptions import LDAPException
 
 from domain_management import misc
@@ -10,6 +11,7 @@ class DomainManager:
     """
     Класс управления Active Directory
     """
+
     def __init__(self, server_ip: str, domain: str, login: str, password: str):
         """
         Конструктор
@@ -89,8 +91,24 @@ class DomainManager:
         self.__connection.search(search_tree, "(objectCategory=person)", SUBTREE, attributes=attrs)
         return self.__connection.entries
 
-    def get_all_org_units(self):
-        pass
+    def get_all_users_as_dict(self) -> dict:
+        """
+
+        """
+        users_attrs_as_dict = {}
+        for attrs in self.__connection.entries:
+            users_attrs_as_dict.update({
+                attrs["sAMAccountName"].value: {
+                    "Display name": attrs["displayName"].value,
+                    "Mobile": attrs["mobile"].value
+                }
+            })
+        return users_attrs_as_dict
+
+    def get_all_org_units(self, attrs: list):
+        search_tree = self.__get_search_tree(self.__domain)
+        self.__connection.search(search_tree, "(objectClass=organizationalUnit)", SUBTREE, attributes=attrs, )
+        return self.__connection.entries
 
     def disconnect(self):
         return self.__connection.unbind()

@@ -13,10 +13,8 @@ async def get_all_users_command(message: types.Message):
     dm = DomainManager(creds.AD_SERVER_IP, creds.DOMAIN, creds.AD_LOGIN, creds.AD_PASSWORD)
     if dm.is_connected:
         attrs = ["sAMAccountName", "displayName", "mobile"]
-        dict_of_users = {}
-        for user in dm.get_all_users(attrs):
-            dict_of_users.update({str(user.sAMAccountName): str(user.displayName)})
-        msg = misc.pretty_print_dict(dict_of_users)
+        dm.get_all_users(attrs)
+        msg = misc.pretty_print_dict(dm.get_all_users_as_dict())
         await message.answer(f"<code>{msg}</code>")
         dm.disconnect()
     else:

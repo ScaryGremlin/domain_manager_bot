@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 
 import paramiko
+import yaml
 
 
 def get_password(password_length=6, by_chance=None) -> str:
@@ -64,8 +65,4 @@ def pretty_print_dict(dictionary: dict) -> str:
     :param dictionary: Словарь, который необходимо распечатать
     :return: Строка, пригодная для печати
     """
-    pretty_string = ""
-    for k in sorted(dictionary.keys()):
-        pretty_string += f"{k}, {dictionary[k]}\n"
-    pretty_string += "\n"
-    return pretty_string
+    return yaml.dump(dictionary, indent=2, allow_unicode=True)

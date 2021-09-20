@@ -1,4 +1,5 @@
 from aiogram import types
+from ldap3 import ALL_ATTRIBUTES
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
@@ -16,30 +17,37 @@ async def select_user_button_command(message: types.Message):
         [InlineKeyboardButton(text="Выбрать пользователя", switch_inline_query_current_chat="users")]
     ]
     await message.answer("Создать директорию пользователя", reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
-    await CreateUserDirQuestions.first()
+    # await CreateUserDirQuestions.first()
 
 
-@dispatcher.inline_handler(text="users", state=CreateUserDirQuestions.Q1)
-async def select_user_command(query: types.InlineQuery, state: FSMContext):
+@dispatcher.inline_handler(text="users")
+async def select_user_command(query: types.InlineQuery):
     dm = DomainManager(creds.AD_SERVER_IP, creds.DOMAIN, creds.AD_LOGIN, creds.AD_PASSWORD)
     if dm.is_connected:
+        query.offset = 20
+        print(query.offset)
         attrs = ["sAMAccountName", "displayName", "mobile"]
         list_of_users = []
-        dict_of_users = {}
-        for user in dm.get_all_users(attrs):
-            dict_of_users.update({str(user.sAMAccountName): [str(user.displayName), str(user.mobile)]})
-        for key in sorted(dict_of_users.keys()):
+        dm.get_all_users(attrs)
+        users_attrs_as_dict = dm.get_all_users_as_dict()
+
+        for i in dm.get_all_org_units(["ou"]):
+            print(i.ou)
+
+        for key in sorted(users_attrs_as_dict.keys()):
             sm_account_name = key
-            display_name, mobile = dict_of_users.get(key)
+            display_name = users_attrs_as_dict.get(key).get("Display name")
+            mobile = users_attrs_as_dict.get(key).get("Mobile")
             list_of_users.append(
                 types.InlineQueryResultArticle(
-                    id=str(sm_account_name),
-                    title=str(sm_account_name),
-                    input_message_content=types.InputTextMessageContent(message_text=sm_account_name),
+                    id=sm_account_name,
+                    title=sm_account_name,
+                    input_message_content=types.InputTextMessageContent(message_text=sm_account_name, parse_mode="HTML"),
                     description=f"Display name: {display_name}\nMobile: {mobile}"
                 )
             )
-        await query.answer(results=list_of_users)
+        await query.answer(results=list_of_users, cache_time=0)
+        dm.disconnect()
     else:
         await query.answer(results=[
             types.InlineQueryResultArticle(
@@ -47,4 +55,16 @@ async def select_user_command(query: types.InlineQuery, state: FSMContext):
                 title=ResultsMessages.ERROR_CONNECTING_AD,
                 input_message_content=types.InputTextMessageContent(message_text=ResultsMessages.ERROR_CONNECTING_AD)
             )
-        ])
+        ], cache_time=0)
+
+
+def get_fake_results(start_num: int, size: int = 50):
+    overall_items = 195
+    # Если результатов больше нет, отправляем пустой список
+    if start_num >= overall_items:
+        return []
+    # Отправка неполной пачки (последней)
+    elif start_num + size >= overall_items:
+        return list(range(start_num, overall_items+1))
+    else:
+        return list(range(start_num, start_num+size))
