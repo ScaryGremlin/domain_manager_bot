@@ -1,5 +1,8 @@
+import json
 import random
 from datetime import datetime
+from itertools import islice
+from typing import Any
 
 import paramiko
 import yaml
@@ -31,7 +34,7 @@ def get_password(password_length=6, by_chance=None) -> str:
 
 def get_userdata_from_rawstring(raw_string: str) -> list:
     """
-    Получить данные пользователя - ФИО, подразделение, мобильный телефон в виде списка
+    Получить данные пользователя в виде списка
     Строка, разделяется по запятой в список, с удалением символов пробела в начале и в конце каждого элемента списка
     :param raw_string: Сырая строка данных
     :return: Список данных
@@ -66,3 +69,17 @@ def pretty_print_dict(dictionary: dict) -> str:
     :return: Строка, пригодная для печати
     """
     return yaml.dump(dictionary, indent=2, allow_unicode=True)
+
+
+def get_slice_dict(dictionary: dict, start: int, size: int):
+    return islice(dictionary, start, start + size)
+
+
+def write_dict_in_file(file_name: str, dictionary: dict) -> None:
+    with open(file_name, "w") as file:
+        json.dump(dictionary, file, sort_keys=True, indent=2, ensure_ascii=False)
+
+
+def get_dict_from_file(file_name: str) -> Any:
+    with open(file_name, "r") as file:
+        return json.load(file)

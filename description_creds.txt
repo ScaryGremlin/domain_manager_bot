@@ -1,0 +1,42 @@
+# Описание файла .env
+
+# Token бота
+BOT_TOKEN=1706171328:AAGElGG12...
+
+# Идентификаторы пользователей в Telegram, которые будут админами бота.
+# Указываются через запятую, без пробела.
+BOT_ADMINS=139653633,139653622
+
+# IP-адрес сервера Active Directory
+AD_SERVER_IP=192.168.1.220
+
+# Логин администратора Active Directory в виде ORG\Administrator,
+# где ORG - NetBIOS имя домена
+AD_LOGIN=ORG\Administartor
+
+# Пароль администратора Active Directory
+AD_PASSWORD=Pa$$w0rd
+
+# Домен Active Directory
+DOMAIN=org.mydomain.ru
+
+# IP-адрес SMB-сервера
+SMB_SERVER_IP=192.168.1.221
+
+# FQDN-имя SMB-сервера
+SMB_SERVER_NAME=smb-server.org.mydomain.ru
+
+# Логин для аутентификации на SMB-сервере
+SMB_SERVER_LOGIN=Administrator
+
+# IP-адресс SSH-сервера
+SSH_SERVER_IP=192.168.1.222
+
+# Имя пользователя для подключения по SSH
+SSH_USER=tomin
+
+# Пароль пользователя SSH для выполнения команд от имени root (sudo)
+SSH_SUDO_PASSWORD=Pa$$w0rd
+
+# Название общей директории на SMB-сервере
+SHARE=exchange

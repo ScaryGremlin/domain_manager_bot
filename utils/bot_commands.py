@@ -10,7 +10,7 @@ async def set_bot_commands(dispatcher: Dispatcher):
         BotCommand("get_all_org_units", "Показать все подразделения домена"),
         BotCommand("add_user_account", "Добавить учётную запись пользователя домена"),
         BotCommand("create_user_dir", "Создать личную директорию пользователя и файл с паролем"),
-        BotCommand("description_settings", "Описание файла credentials для подключения к Active Directory"),
-        BotCommand("post_settings", "Передать файл credentials для подключения к Active Directory"),
+        BotCommand("description_creds", "Описание файла credentials для подключения к Active Directory"),
+        BotCommand("post_creds", "Передать файл credentials для подключения к Active Directory"),
         BotCommand("help", "Помощь"),
     ])

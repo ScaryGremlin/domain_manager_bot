@@ -7,6 +7,9 @@ from aiogram.dispatcher.filters import CommandHelp
 @dispatcher.message_handler(CommandHelp())
 async def help_command(message: types.Message):
     await message.answer("/check_connection — проверить соединение с сервером Active Directory; \n"
+                         "/get_all_users — показать всех пользователей домена; \n"
+                         "/get_all_org_units — показать все подразделения домена; \n"
+                         "\n"
                          "/add_user_account — добавить учётную запись пользователя домена; \n"
                          "/create_user_dir — создать личную директорию пользователя и файл с паролем; \n"
                          "\n"
